@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>蓝图工坊 · 制图员工具箱</title>
+  <meta name="description" content="工程制图风的开发者工具箱：JSON 校验格式化、编码转换、SHA 哈希、UUID 生成、时间戳换算、正则测试。全部本地运行。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="sheet">
+
+    <!-- 图签标题栏 -->
+    <header class="titleblock">
+      <div class="tb-mark">
+        <span class="glyph">⌬</span>
+        <span class="led" id="led"></span>
+      </div>
+      <div class="tb-name">
+        <h1>蓝 图 工 坊</h1>
+        <p>BLUEPRINT WORKSHOP · DWG NO. 0018 · SCALE 1:1</p>
+      </div>
+      <div class="tb-cells">
+        <div><small>制图</small><b>LOCALHOST</b></div>
+        <div><small>审校</small><b>YOU</b></div>
+        <div><small>图幅</small><b>A-6 TOOLS</b></div>
+      </div>
+    </header>
+
+    <!-- 工具索引 -->
+    <nav class="index" id="index">
+      <button class="tab active" data-t="json"><i>01</i>JSON 校验</button>
+      <button class="tab" data-t="codec"><i>02</i>编码转换</button>
+      <button class="tab" data-t="hash"><i>03</i>哈希计算</button>
+      <button class="tab" data-t="uuid"><i>04</i>UUID 生成</button>
+      <button class="tab" data-t="stamp"><i>05</i>时间戳</button>
+      <button class="tab" data-t="regex"><i>06</i>正则测试</button>
+    </nav>
+
+    <main class="board">
+
+      <!-- 01 JSON -->
+      <section class="tool on" id="json">
+        <h2 class="fig">图 01 · JSON 校验与格式化</h2>
+        <div class="grid2">
+          <div class="pane">
+            <label>输入 INPUT</label>
+            <textarea id="jsonIn" spellcheck="false" placeholder='{"name":"蓝图工坊","tools":6,"offline":true}'></textarea>
+            <div class="acts">
+              <button class="btn" id="jsonFmt">格式化</button>
+              <button class="btn" id="jsonMin">压缩</button>
+              <button class="btn ghost" id="jsonCopy">复制结果</button>
+            </div>
+          </div>
+          <div class="pane out-pane">
+            <label>输出 OUTPUT</label>
+            <pre id="jsonOut" class="result">等待制图……</pre>
+            <p class="stamp" id="jsonStamp"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 编码 -->
+      <section class="tool" id="codec" hidden>
+        <h2 class="fig">图 02 · Base64 / URL 编码转换</h2>
+        <div class="grid2">
+          <div class="pane">
+            <label>明文 PLAIN</label>
+            <textarea id="codecIn" spellcheck="false" placeholder="输入文字，自动双向换算……"></textarea>
+          </div>
+          <div class="pane out-pane">
+            <label>密文 ENCODED</label>
+            <textarea id="codecOut" spellcheck="false" placeholder="或在此粘贴 Base64 / URL 编码，往回解……"></textarea>
+          </div>
+        </div>
+        <div class="acts">
+          <button class="btn" id="enc64">→ Base64</button>
+          <button class="btn" id="dec64">Base64 →</button>
+          <button class="btn" id="encUrl">→ URL</button>
+          <button class="btn" id="decUrl">URL →</button>
+          <button class="btn ghost" id="codecSwap">⇅ 交换</button>
+        </div>
+        <p class="stamp" id="codecStamp"></p>
+      </section>
+
+      <!-- 03 哈希 -->
+      <section class="tool" id="hash" hidden>
+        <h2 class="fig">图 03 · SHA 哈希（Web Crypto）</h2>
+        <div class="pane">
+          <label>原文 TEXT</label>
+          <textarea id="hashIn" rows="4" spellcheck="false" placeholder="输入任意文本，即时计算摘要……"></textarea>
+        </div>
+        <ul class="hash-list" id="hashList">
+          <li><span>SHA-1</span><code id="sha1">—</code><button class="mini" data-h="sha1">复制</button></li>
+          <li><span>SHA-256</span><code id="sha256">—</code><button class="mini" data-h="sha256">复制</button></li>
+          <li><span>SHA-384</span><code id="sha384">—</code><button class="mini" data-h="sha384">复制</button></li>
+          <li><span>SHA-512</span><code id="sha512">—</code><button class="mini" data-h="sha512">复制</button></li>
+        </ul>
+      </section>
+
+      <!-- 04 UUID -->
+      <section class="tool" id="uuid" hidden>
+        <h2 class="fig">图 04 · UUID v4 批量出图</h2>
+        <div class="acts row">
+          <label>数量 <output id="uuidN">5</output></label>
+          <input type="range" id="uuidCount" min="1" max="30" value="5" />
+          <button class="btn" id="uuidGen">重新出图</button>
+          <button class="btn ghost" id="uuidCopy">复制全部</button>
+        </div>
+        <ol class="uuid-list" id="uuidList"></ol>
+      </section>
+
+      <!-- 05 时间戳 -->
+      <section class="tool" id="stamp" hidden>
+        <h2 class="fig">图 05 · Unix 时间戳换算</h2>
+        <div class="stamp-live">
+          <b id="nowTs">—</b>
+          <span id="nowStr">—</span>
+        </div>
+        <div class="grid2">
+          <div class="pane">
+            <label>时间戳 → 日期</label>
+            <div class="row">
+              <input id="tsIn" class="ipt" placeholder="如 1770000000 或 1770000000123" />
+              <button class="btn" id="tsGo">换算</button>
+            </div>
+            <pre class="result small" id="tsOut">—</pre>
+          </div>
+          <div class="pane">
+            <label>日期 → 时间戳</label>
+            <div class="row">
+              <input id="dateIn" class="ipt" type="datetime-local" />
+              <button class="btn" id="dateGo">换算</button>
+            </div>
+            <pre class="result small" id="dateOut">—</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 正则 -->
+      <section class="tool" id="regex" hidden>
+        <h2 class="fig">图 06 · 正则表达式测试台</h2>
+        <div class="pane">
+          <div class="row">
+            <span class="slash">/</span>
+            <input id="rePat" class="ipt mono" value="(\w+)@(\w+)\.com" spellcheck="false" />
+            <span class="slash">/</span>
+            <input id="reFlags" class="ipt flags" value="g" maxlength="4" spellcheck="false" />
+          </div>
+          <textarea id="reText" rows="6" spellcheck="false">联系 alice@example.com 或 bob@example.org，备用 admin@example.com。</textarea>
+        </div>
+        <div class="re-stats" id="reStats">—</div>
+        <div class="re-canvas" id="reCanvas"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
